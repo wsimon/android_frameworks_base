@@ -2418,7 +2418,7 @@ class PowerManagerService extends IPowerManager.Stub
                     break;
                 }
             }
-	    return levels[i];
+	    return values[i];
         } catch (Exception e) {
             // guard against null pointer or index out of bounds errors
             Slog.e(TAG, "getAutoBrightnessValue", e);
@@ -2607,8 +2607,6 @@ class PowerManagerService extends IPowerManager.Stub
                        mLastLcdValue,
                        (mCustomLightEnabled ? mCustomLightLevels : mAutoBrightnessLevels),
                        (mCustomLightEnabled ? mCustomLcdValues : mLcdBacklightValues));
-                }
-
                 int buttonValue = getAutoBrightnessValue(value, mLastButtonValue,
                         (mCustomLightEnabled ? mCustomLightLevels : mAutoBrightnessLevels),
                         (mCustomLightEnabled ? mCustomButtonValues : mButtonBacklightValues));
