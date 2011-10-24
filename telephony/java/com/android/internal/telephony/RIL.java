@@ -2304,6 +2304,8 @@ public class RIL extends BaseCommands implements CommandsInterface {
             case RIL_REQUEST_EXIT_EMERGENCY_CALLBACK_MODE: ret = responseVoid(p); break;
             case RIL_REQUEST_REPORT_SMS_MEMORY_STATUS: ret = responseVoid(p); break;
             case RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING: ret = responseVoid(p); break;
+            case RIL_REQUEST_CDMA_PRL_VERSION: ret = responseString(p); break; // RIL_REQUEST_CDMA_PRL_VERSION
+
             default:
                 throw new RuntimeException("Unrecognized solicited response: " + rr.mRequest);
             //break;
@@ -2450,8 +2452,8 @@ public class RIL extends BaseCommands implements CommandsInterface {
  * Source: Motorola disassembly and Aurora git codebase
  */
 	    case RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED: ret = responseInts(p); break;
-	    case RIL_UNSOL_CDMA_PRL_CHANGED: ret = responseInts(p); break;
-	    case RIL_UNSOL_CDMA_PRL_CHANGED2: ret = responseInts(p); break;
+	    case RIL_UNSOL_CDMA_PRL_CHANGED: ret = responseVoid(p); break;
+	    case RIL_UNSOL_CDMA_PRL_CHANGED2: ret = responseVoid(p); break;
 	    case RIL_UNSOL_EXIT_EMERGENCY_CALLBACK_MODE: ret = responseVoid(p); break;
 	    case RIL_UNSOL_VOICE_RADIO_TECH_CHANGED: ret = responseVoid(p); break;
 
@@ -2762,7 +2764,7 @@ public class RIL extends BaseCommands implements CommandsInterface {
  * KD 8/28 - Add new upcall routines for the added CDMA radio states
  */
             case RIL_UNSOL_CDMA_SUBSCRIPTION_SOURCE_CHANGED:
-                if (RILJ_LOGD) unsljLog(response);
+                if (RILJ_LOGD) unsljLogRet(response, ret);
                 int [] ssource = (int[])ret;
 
                 if(mCdmaSubscriptionSourceChangedRegistrants != null) {
@@ -2772,13 +2774,15 @@ public class RIL extends BaseCommands implements CommandsInterface {
                 break;
             case RIL_UNSOL_CDMA_PRL_CHANGED:
             case RIL_UNSOL_CDMA_PRL_CHANGED2:
-                if (RILJ_LOGD) unsljLog(response);
-                int [] prlv = (int [])ret;
-
-                if(mCdmaPrlChangedRegistrants != null) {
-                    mCdmaPrlChangedRegistrants.notifyRegistrants(
-                          new AsyncResult(null, prlv, null));
-                }
+    		riljLogv("UNSOL PRL Change Upcall");
+//                unsljLogRet(response, ret);
+//                if (RILJ_LOGD) unsljLogRet(response, ret);
+//                int [] prlv = (int [])ret;
+//
+//                if(mCdmaPrlChangedRegistrants != null) {
+//                    mCdmaPrlChangedRegistrants.notifyRegistrants(
+//                          new AsyncResult(null, prlv, null));
+//                }
                 break;
         }
     }
@@ -3396,6 +3400,7 @@ public class RIL extends BaseCommands implements CommandsInterface {
             case RIL_REQUEST_EXIT_EMERGENCY_CALLBACK_MODE: return "REQUEST_EXIT_EMERGENCY_CALLBACK_MODE";
             case RIL_REQUEST_REPORT_SMS_MEMORY_STATUS: return "RIL_REQUEST_REPORT_SMS_MEMORY_STATUS";
             case RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING: return "RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING";
+            case RIL_REQUEST_CDMA_PRL_VERSION: return "RIL_REQUEST_CDMA_PRL_VERSION";
             default: return "<unknown request>";
         }
     }
@@ -3482,6 +3487,15 @@ public class RIL extends BaseCommands implements CommandsInterface {
     public void
     getCDMASubscription(Message response) {
         RILRequest rr = RILRequest.obtain(RIL_REQUEST_CDMA_SUBSCRIPTION, response);
+
+        if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest));
+
+        send(rr);
+    }
+
+    public void
+    getCDMAPrlVersion(Message response) {
+        RILRequest rr = RILRequest.obtain(RIL_REQUEST_CDMA_PRL_VERSION, response);
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest));
 

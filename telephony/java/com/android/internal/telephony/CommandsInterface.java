@@ -1272,6 +1272,13 @@ public interface CommandsInterface {
      *   [3] is MIN (10 digits, MIN2+MIN1) if CDMA subscription is available
      */
     public void getCDMASubscription(Message response);
+    
+/**
+     * Request the device PRL for CDMA Services.
+     * "response" is const char **
+     *   [0] is the PRL Version
+     */
+    public void getCDMAPrlVersion(Message response);
 
     /**
      * Send Flash Code.

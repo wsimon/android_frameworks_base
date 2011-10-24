@@ -1372,6 +1372,12 @@ public final class SimulatedCommands extends BaseCommands
     }
 
     public void
+    getCDMAPrlVersion(Message response) {
+        Log.w(LOG_TAG, "CDMA not implemented in SimulatedCommands");
+        unimplemented(response);
+    }
+
+    public void
     setCdmaSubscription(int cdmaSubscriptionType, Message response) {
         Log.w(LOG_TAG, "CDMA not implemented in SimulatedCommands");
         unimplemented(response);

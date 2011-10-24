@@ -128,6 +128,7 @@ public abstract class ServiceStateTracker extends Handler {
  */
     protected static final int EVENT_CDMA_SUBSCRIPTION_SOURCE_CHANGED  = 40;
     protected static final int EVENT_CDMA_PRL_VERSION_CHANGED          = 41;
+    protected static final int EVENT_POLL_STATE_PRL_VERSION_CHANGED    = 42;
 
 
 

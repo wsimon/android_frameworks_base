@@ -343,6 +343,31 @@ final class CdmaServiceStateTracker extends ServiceStateTracker {
             Log.w(LOG_TAG, "CDMA Subscription Source Upcall request");
             cm.getCDMASubscription( obtainMessage(EVENT_POLL_STATE_CDMA_SUBSCRIPTION));	
             break;
+/*
+ * KD 10/23 - Pull the PRL version if it has changed
+ */
+        case EVENT_CDMA_PRL_VERSION_CHANGED:
+            Log.w(LOG_TAG, "PRL Version Upcall request");
+            cm.getCDMAPrlVersion(obtainMessage(EVENT_POLL_STATE_PRL_VERSION_CHANGED));	
+            break;
+
+        case EVENT_POLL_STATE_PRL_VERSION_CHANGED:
+            ar = (AsyncResult) msg.obj;
+
+            if (ar.exception == null) {
+                String PrlNumber = (String)ar.result;
+	    	Log.w(LOG_TAG, "PRL: " + PrlNumber);
+// KD 10-23 
+// If the returned PRL is valid, use it.  Otherwise use the sysprop version
+//
+		if (PrlNumber != null) {
+			mPrlVersion = PrlNumber;
+		}
+	    } else {
+	    	Log.e(LOG_TAG, "PRL grab FAILED - no return string");
+	    }
+	    break;
+// End KD
 
         case EVENT_NETWORK_STATE_CHANGED_CDMA:
             Log.w(LOG_TAG, "CDMA NETwork State Change Upcall request");
@@ -1025,6 +1050,13 @@ final class CdmaServiceStateTracker extends ServiceStateTracker {
             cm.getRegistrationState(
                     obtainMessage(EVENT_POLL_STATE_REGISTRATION_CDMA, pollingContext));
 
+// KD 10-23 - Issue a request for the PRL but do not require it to come
+// back valid for the radio to come online.  For whatever reason, we don't
+// get this from the Qualcomm code on the Triumph
+//          pollingContext[0]++;
+            // RIL_REQUEST_CDMA_PRL_VERSION for CDMA
+            cm.getCDMAPrlVersion(
+                    obtainMessage(EVENT_CDMA_PRL_VERSION_CHANGED, pollingContext));
             break;
         }
     }
