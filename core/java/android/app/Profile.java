@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class Profile implements Parcelable {
+public final class Profile implements Parcelable {
 
     private String mName;
     private int mNameResId;
@@ -83,10 +83,14 @@ public class Profile implements Parcelable {
 
     /** @hide */
     public void addProfileGroup(ProfileGroup value) {
-        profileGroups.put(value.getUuid(), value);
         if (value.isDefaultGroup()) {
+            /* we must not have more than one default group */
+            if (mDefaultGroup != null) {
+                return;
+            }
             mDefaultGroup = value;
         }
+        profileGroups.put(value.getUuid(), value);
         mDirty = true;
     }
 

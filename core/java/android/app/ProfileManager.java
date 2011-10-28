@@ -227,10 +227,19 @@ public class ProfileManager
         NotificationGroup notificationGroup = getNotificationGroupForPackage(packageName);
         if(notificationGroup == null){
             ProfileGroup defaultGroup = getActiveProfile().getDefaultGroup();
-            Log.v(TAG, "No active group, returning default: " +
-                    (defaultGroup == null ? "null" : defaultGroup.getUuid()));
             return defaultGroup;
         }
         return getActiveProfile().getProfileGroup(notificationGroup.getUuid());
+    }
+
+    /** @hide */
+    public void resetAll() {
+        try {
+            getService().resetAll();
+        } catch (RemoteException e) {
+            Log.e(TAG, e.getLocalizedMessage(), e);
+        } catch (SecurityException e) {
+            Log.e(TAG, e.getLocalizedMessage(), e);
+        }
     }
 }

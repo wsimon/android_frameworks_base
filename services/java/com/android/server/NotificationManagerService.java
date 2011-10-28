@@ -85,6 +85,10 @@ import java.util.Calendar;
 import java.util.Random;
 import android.graphics.Color;
 
+/* TI FM UI port -start */
+import android.os.SystemProperties;
+/* TI FM UI port -stop */
+
 /** {@hide} */
 public class NotificationManagerService extends INotificationManager.Stub
 {
@@ -983,7 +987,6 @@ public class NotificationManagerService extends INotificationManager.Stub
                         (ProfileManager) mContext.getSystemService(Context.PROFILE_SERVICE);
 
                 ProfileGroup group = profileManager.getActiveProfileGroup(pkg);
-                Log.v(TAG, "Pkg: " + pkg + " group: " + group.getUuid());
                 notification = group.processNotification(notification);
             } catch(Throwable th) {
                 Log.e(TAG, "An error occurred profiling the notification.", th);
@@ -1018,10 +1021,24 @@ public class NotificationManagerService extends INotificationManager.Stub
                     mSoundNotification = r;
                     // do not play notifications if stream volume is 0
                     // (typically because ringer mode is silent).
+
                     if (audioManager.getStreamVolume(audioStreamType) != 0) {
                         long identity = Binder.clearCallingIdentity();
                         try {
-                            mSound.play(mContext, uri, looping, audioStreamType);
+
+                        /* TI FM UI port -start */
+                        if (SystemProperties.OMAP_ENHANCEMENT) {
+                             Slog.d(TAG,"sending mute to fm");
+                            String FM_MUTE_CMD = "com.ti.server.fmmutecmd";
+                            // Tell the FM playback service to Mute FM,
+                            // as the notification playback is starting.
+                            // TODO: these constants need to be published somewhere in the framework
+                            Intent fmmute = new Intent(FM_MUTE_CMD);
+                            mContext.sendBroadcast(fmmute);
+                         }
+                         /* TI FM UI port -stop */
+                         mSound.play(mContext, uri, looping, audioStreamType);
+
                         }
                         finally {
                             Binder.restoreCallingIdentity(identity);
@@ -1148,6 +1165,16 @@ public class NotificationManagerService extends INotificationManager.Stub
             long identity = Binder.clearCallingIdentity();
             try {
                 mSound.stop();
+
+                /* TI FM UI port -start */
+                if (SystemProperties.OMAP_ENHANCEMENT) {
+                    String FM_UNMUTE_CMD = "com.ti.server.fmunmutecmd";
+                    /* Tell the FM playback service to unmute FM,as the notification playback is over.*/
+                    // TODO: these constants need to be published somewhere in the framework.
+                    Intent fmunmute = new Intent(FM_UNMUTE_CMD);
+                    mContext.sendBroadcast(fmunmute);
+                }
+                /* TI FM UI port - stop */
             }
             finally {
                 Binder.restoreCallingIdentity(identity);
