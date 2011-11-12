@@ -1233,6 +1233,8 @@ int SurfaceFlinger::setOrientation(DisplayID dpy,
             orientation = BAD_VALUE;
         }
     }
+    const DisplayHardware& hw(graphicPlane(0).displayHardware());
+    hw.orientationChanged(orientation);
     return orientation;
 }
 
