@@ -942,13 +942,6 @@ EGLBoolean eglSwapBuffers(EGLDisplay dpy, EGLSurface draw)
         return setError(EGL_BAD_SURFACE, EGL_FALSE);
 
     egl_surface_t const * const s = get_surface(draw);
-// Hack to enable OpenGL
-#ifdef BOARD_GL_OES_EGL_IMG_EXTERNAL_HACK
-    s->cnx->egl.eglSwapBuffers(dp->disp[s->impl].dpy, s->surface);
-	return EGL_TRUE;
-#else
-    return s->cnx->egl.eglSwapBuffers(dp->disp[s->impl].dpy, s->surface);
-#endif 
     return s->cnx->egl.eglSwapBuffers(dp->disp[s->impl].dpy, s->surface);
 }
 
