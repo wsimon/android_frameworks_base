@@ -967,7 +967,7 @@ void InputDevice::process(const RawEvent* rawEvents, size_t count) {
 
             // Old touchscreen sensors need to send a fake BTN_TOUCH (BTN_LEFT)
 
-            if (rawEvent->scanCode == ABS_MT_TOUCH_MAJOR) {
+            if (rawEvent->scanCode == ABS_MT_TOUCH_MAJOR && rawEvent->type == EV_ABS) {
 
                 z_data = rawEvent->value;
                 touched = (0 != z_data);
@@ -2226,6 +2226,13 @@ void CursorInputMapper::process(const RawEvent* rawEvent) {
     if (rawEvent->type == EV_SYN && rawEvent->scanCode == SYN_REPORT) {
         sync(rawEvent->when);
     }
+#ifdef LEGACY_TRACKPAD
+    // sync now since BTN_MOUSE is not necessarily followed by SYN_REPORT and
+    // we need to ensure that we report the up/down promptly.
+    else if (rawEvent->type == EV_KEY && rawEvent->scanCode == BTN_MOUSE) {
+        sync(rawEvent->when);
+    }
+#endif
 }
 
 void CursorInputMapper::sync(nsecs_t when) {
