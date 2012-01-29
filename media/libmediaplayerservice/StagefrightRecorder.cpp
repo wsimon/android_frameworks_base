@@ -1389,7 +1389,7 @@ status_t StagefrightRecorder::setupVideoEncoder(
     CHECK_EQ(client.connect(), OK);
 
     uint32_t encoder_flags = 0;
-    if (mIsMetaDataStoredInVideoBuffers) {
+    if (0 && mIsMetaDataStoredInVideoBuffers) {
         encoder_flags |= OMXCodec::kHardwareCodecsOnly;
         encoder_flags |= OMXCodec::kStoreMetaDataInVideoBuffers;
     }
