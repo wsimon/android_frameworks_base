@@ -201,6 +201,7 @@ public class PowerManagerService extends IPowerManager.Stub
     private LightsService.Light mButtonLight;
     private LightsService.Light mKeyboardLight;
     private LightsService.Light mAttentionLight;
+    private boolean mStayOnWhilePluggedIn;
     private UnsynchronizedWakeLock mBroadcastWakeLock;
     private UnsynchronizedWakeLock mStayOnWhilePluggedInScreenDimLock;
     private UnsynchronizedWakeLock mStayOnWhilePluggedInPartialLock;
@@ -297,7 +298,8 @@ public class PowerManagerService extends IPowerManager.Stub
 
     // could be either static or controllable at runtime
     private static final boolean mSpew = false;
-    private static final boolean mDebugProximitySensor = (false || mSpew);
+//    private static final boolean mDebugProximitySensor = (false || mSpew);
+    private static final boolean mDebugProximitySensor = (true);
     private static final boolean mDebugLightSensor = (false || mSpew);
     
     private native void nativeInit();
@@ -607,6 +609,7 @@ public class PowerManagerService extends IPowerManager.Stub
     void initInThread() {
         mHandler = new Handler();
 
+        mStayOnWhilePluggedIn = false;
         mBroadcastWakeLock = new UnsynchronizedWakeLock(
                                 PowerManager.PARTIAL_WAKE_LOCK, "sleep_broadcast", true);
         mStayOnWhilePluggedInScreenDimLock = new UnsynchronizedWakeLock(
@@ -649,7 +652,7 @@ public class PowerManagerService extends IPowerManager.Stub
             mLightSensorWarmupTime = resources.getInteger(
                     com.android.internal.R.integer.config_lightSensorWarmupTime);
         }
-
+mStayOnWhilePluggedIn = false;
        ContentResolver resolver = mContext.getContentResolver();
         Cursor settingsCursor = resolver.query(Settings.System.CONTENT_URI, null,
                 "(" + Settings.System.NAME + "=?) or ("
@@ -742,9 +745,11 @@ public class PowerManagerService extends IPowerManager.Stub
             // keep the device on if we're plugged in and mStayOnWhilePluggedIn is set.
             mStayOnWhilePluggedInScreenDimLock.acquire();
             mStayOnWhilePluggedInPartialLock.acquire();
+            mStayOnWhilePluggedIn = true;
         } else {
             mStayOnWhilePluggedInScreenDimLock.release();
             mStayOnWhilePluggedInPartialLock.release();
+            mStayOnWhilePluggedIn = false;
         }
     }
 
@@ -2070,10 +2075,10 @@ public class PowerManagerService extends IPowerManager.Stub
                         // automatically turn off while plugged in.  To
                         // still have a sense of when it is inactive, we
                         // will then count going dim as turning off.
-                        mScreenOffTime = SystemClock.elapsedRealtime();
-                        mAlwaysOnAndDimmed = true;
+//                        mScreenOffTime = SystemClock.elapsedRealtime();
+//                        mAlwaysOnAndDimmed = true;
                     }
-                    brightness = mScreenDim;
+//                    brightness = mScreenDim;
                 }
             }
             long identity = Binder.clearCallingIdentity();
@@ -3423,7 +3428,7 @@ public class PowerManagerService extends IPowerManager.Stub
                         distance < mProximitySensor.getMaximumRange());
 
                 if (mDebugProximitySensor) {
-                    Slog.d(TAG, "mProximityListener.onSensorChanged active: " + active);
+                    Slog.d(TAG, "mProximityListener.onSensorChanged active: " + active  + " Distance: " + distance);
                 }
                 if (timeSinceLastEvent < PROXIMITY_SENSOR_DELAY) {
                     // enforce delaying atleast PROXIMITY_SENSOR_DELAY before processing
