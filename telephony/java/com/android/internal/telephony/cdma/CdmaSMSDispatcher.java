@@ -204,6 +204,7 @@ final class CdmaSMSDispatcher extends SMSDispatcher {
                 (SmsEnvelope.MESSAGE_TYPE_BROADCAST != sms.getMessageType())) {
             return Intents.RESULT_SMS_UNSUPPORTED;
         }
+
         /* 
          * 2/4
          * Check to see if we have a Virgin Mobile MMS
@@ -233,7 +234,7 @@ final class CdmaSMSDispatcher extends SMSDispatcher {
         
     }
 
-       private synchronized byte[] getVirginMMS(final byte[] someEncodedMMSData, int[] aMessageRef) throws Exception {
+        private synchronized byte[] getVirginMMS(final byte[] someEncodedMMSData, int[] aMessageRef) throws Exception {
                 if ((aMessageRef == null) || (aMessageRef.length != 1)) {
                         throw new Exception("aMessageRef is not usable. Must be an int array with one element.");
                 }
@@ -243,19 +244,19 @@ final class CdmaSMSDispatcher extends SMSDispatcher {
                 Log.d(VIRGIN_DEBUG_TAG, "mmsVirginGetMsgId");
                 Log.d(VIRGIN_DEBUG_TAG, "EncodedMMS: " + someEncodedMMSData);
                 try {
-            ourInputStream = new BitwiseInputStream(someEncodedMMSData);
-            ourInputStream.skip(20);
-            final int j = ourInputStream.read(8) << 8;
-            final int k = ourInputStream.read(8);
-            aMessageRef[0] = j | k;
-                 Log.d(VIRGIN_DEBUG_TAG, "MSGREF IS : " + aMessageRef[0]);
-            ourInputStream.skip(12);
-            i1 = ourInputStream.read(8) + -2;
-            ourInputStream.skip(13);
-            byte abyte1[] = new byte[i1];
-            for (int j1 = 0; j1 < i1; j1++) {
-                abyte1[j1] = 0;
-            }
+                    ourInputStream = new BitwiseInputStream(someEncodedMMSData);
+                    ourInputStream.skip(20);
+                    final int j = ourInputStream.read(8) << 8;
+                    final int k = ourInputStream.read(8);
+                    aMessageRef[0] = j | k;
+                    Log.d(VIRGIN_DEBUG_TAG, "MSGREF IS : " + aMessageRef[0]);
+                    ourInputStream.skip(12);
+                    i1 = ourInputStream.read(8) + -2;
+                    ourInputStream.skip(13);
+                    byte abyte1[] = new byte[i1];
+                    for (int j1 = 0; j1 < i1; j1++) {
+                    abyte1[j1] = 0;
+                }
 
             desiredBitLength = i1 * 8;
             if (ourInputStream.available() < desiredBitLength) {
