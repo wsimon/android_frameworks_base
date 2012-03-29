@@ -948,7 +948,7 @@ public final class CdmaDataConnectionTracker extends DataConnectionTracker {
 // reason; the system should re-initialize it.
 //
 		    Log.v(LOG_TAG, "KD: Tear Down bad connection; reset");
-    		    cleanUpConnection(true, "Hung data detected; reset");
+    		    cleanUpConnection(true, "Hung data detected; reset", true);
             }
         } else {
             // TODO: Do we need to do anything?
